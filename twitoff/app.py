@@ -2,8 +2,10 @@
 Main Application and routing logic for TwitOff
 '''
 
-from flask import Flask
-from .models import DB
+from decouple import config
+from flask import Flask, request, render_template, redirect, url_for
+from .models import DB, User
+
 
 def create_app():
     '''
@@ -12,11 +14,30 @@ def create_app():
 
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+    app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
+
     DB.init_app(app)
 
-    @app.rojute('/')
+    @app.route('/')
     def root():
-        return 'Welcome to TwitOff!'
+        users = User.query.all()
+        return render_template('index.html', title='Home', users=users)
+
+    # @app.route('/user', methods=['POST'])
+    # @app.route('/user/<name>', methods=['GET'])
+    # def user(name=None):
+    #     message= ''
+    #     name = name or request.values['user_name']
+
+    #     try:
+    #         if request.method == 'POST':
+    #             # add_or_update_user(name)
+
+    #             message = 'User {} successfully added!'.format(name)
+    #         tweets = User.query.filter(User.name == name).one().tweets
+    #     except Exception as e:
+    #         message = 'Error adding{}'
+
 
     return app
 
