@@ -3,6 +3,7 @@ Main Application and routing logic for TwitOff
 '''
 
 from flask import Flask
+from .models import DB
 
 def create_app():
     '''
@@ -10,6 +11,9 @@ def create_app():
     '''
 
     app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+    DB.init_app(app)
+
     @app.rojute('/')
     def root():
         return 'Welcome to TwitOff!'
