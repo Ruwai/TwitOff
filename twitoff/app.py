@@ -13,8 +13,9 @@ def create_app():
     '''
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+    app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
+    app.config['ENV'] = config('ENV') #TODO change before deploy 'debug'
 
     DB.init_app(app)
 
@@ -38,6 +39,11 @@ def create_app():
     #     except Exception as e:
     #         message = 'Error adding{}'
 
+    @app.route('/reset')
+    def reset():
+        DB.drop_all()
+        DB.create_all()
+        return render_template('index.html', title='DB Reset!', users=[])
 
     return app
 
