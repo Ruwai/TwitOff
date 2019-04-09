@@ -24,20 +24,22 @@ def create_app():
         users = User.query.all()
         return render_template('index.html', title='Home', users=users)
 
-    # @app.route('/user', methods=['POST'])
-    # @app.route('/user/<name>', methods=['GET'])
-    # def user(name=None):
-    #     message= ''
-    #     name = name or request.values['user_name']
+    @app.route('/user', methods=['POST'])
+    @app.route('/user/<name>', methods=['GET'])
+    def user(name=None):
+        message = ''
+        name = name or request.values['user_name']
 
-    #     try:
-    #         if request.method == 'POST':
-    #             # add_or_update_user(name)
+        try:
+            if request.method == 'POST':
+                # add_or_update_user(name)
+                message = 'User {} successfully added!'.format(name)
+            tweets = User.query.filter(User.name == name).one().tweets
+        except Exception as e:
+            message = 'Error adding {}: {}'.format(name, e)
+            tweets = []
 
-    #             message = 'User {} successfully added!'.format(name)
-    #         tweets = User.query.filter(User.name == name).one().tweets
-    #     except Exception as e:
-    #         message = 'Error adding{}'
+        return render_template('user.html', title=name, tweets=tweets, message=message)
 
     @app.route('/reset')
     def reset():

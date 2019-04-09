@@ -44,7 +44,7 @@ def add_or_update_user(username):
             db_user.tweets.append(db_tweet)
             DB.session.add(db_tweet)
     except Exception as e:
-        print('Error with {} at {}'.format(username,e))
+        print('Error processing {}: {}'.format(username, e))
         raise e
 
     else:
