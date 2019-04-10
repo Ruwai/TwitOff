@@ -5,7 +5,8 @@ Main Application and routing logic for TwitOff
 from decouple import config
 from flask import Flask, request, render_template, redirect, url_for
 from .models import DB, User
-
+from .predict import predict_user
+from .twitter import update_all_users
 
 def create_app():
     '''
@@ -26,8 +27,7 @@ def create_app():
 
     @app.route('/user', methods=['POST'])
     @app.route('/user/<name>', methods=['GET'])
-    def user(name=None):
-        message = ''
+    def user(name=None, message = ''):
         name = name or request.values['user_name']
 
         try:
@@ -48,4 +48,23 @@ def create_app():
         return render_template('index.html', title='DB Reset!', users=[])
 
     return app
+
+    @app.route('/update')
+    def update():
+        users = update_all_users(user)
+        return render_template('index.html', title='Tweets Updated!', users=users)
+
+    @app.route('/compare', methods=['POST'])
+    def compare(message=''):
+        user1, user2 = sorted([request.values['user1'],
+                               request.values['user2']])
+        if user1 == user2:
+            message = 'Cannot compare a user to themselves!'
+        else:
+            prediction = predict_user(user1, user2, request.values['tweet_text'])
+            message = '"{}" is more likely to be said by {} than {}'.format(
+                request.values['tweet_text'], user1 if prediction else user2,
+                user2 if prediction else user1)
+        return render_template('prediction.html', title='Prediction', message=message)
+
 
