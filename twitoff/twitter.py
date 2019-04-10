@@ -57,7 +57,7 @@ def add_users(users):
     for user in users:
         add_or_update_user(user)
 
-def update_all_users(user):
+def update_all_users():
     for user in User.query.all():
         add_or_update_user(user.name)
 

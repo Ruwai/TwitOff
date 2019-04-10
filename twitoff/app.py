@@ -6,7 +6,7 @@ from decouple import config
 from flask import Flask, request, render_template, redirect, url_for
 from .models import DB, User
 from .predict import predict_user
-from .twitter import update_all_users
+from .twitter import add_or_update_user, update_all_users
 
 def create_app():
     '''
@@ -32,7 +32,7 @@ def create_app():
 
         try:
             if request.method == 'POST':
-                # add_or_update_user(name)
+                add_or_update_user(name)
                 message = 'User {} successfully added!'.format(name)
             tweets = User.query.filter(User.name == name).one().tweets
         except Exception as e:
@@ -51,7 +51,7 @@ def create_app():
 
     @app.route('/update')
     def update():
-        users = update_all_users(user)
+        users = update_all_users()
         return render_template('index.html', title='Tweets Updated!', users=users)
 
     @app.route('/compare', methods=['POST'])
