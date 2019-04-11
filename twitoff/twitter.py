@@ -3,7 +3,7 @@
 '''
 
 import tweepy
-from od import getenv
+from os import getenv
 from .models import DB, Tweet, User
 import basilica
 

@@ -3,10 +3,13 @@ Main Application and routing logic for TwitOff
 '''
 
 from os import getenv
+from dotenv import load_dotenv
 from flask import Flask, request, render_template, redirect, url_for
 from .models import DB, User
 from .predict import predict_user
 from .twitter import add_or_update_user, update_all_users
+
+load_dotenv()
 
 def create_app():
     '''
@@ -47,8 +50,6 @@ def create_app():
         DB.create_all()
         return render_template('index.html', title='DB Reset!', users=[])
 
-    return app
-
     @app.route('/update')
     def update():
         users = update_all_users()
@@ -67,4 +68,4 @@ def create_app():
                 user2 if prediction else user1)
         return render_template('prediction.html', title='Prediction', message=message)
 
-
+    return app
