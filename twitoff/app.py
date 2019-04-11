@@ -2,7 +2,7 @@
 Main Application and routing logic for TwitOff
 '''
 
-from decouple import config
+from os import getenv
 from flask import Flask, request, render_template, redirect, url_for
 from .models import DB, User
 from .predict import predict_user
@@ -14,9 +14,9 @@ def create_app():
     '''
 
     app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URL')
+    app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
-    app.config['ENV'] = config('ENV') #TODO change before deploy 'debug'
+    app.config['ENV'] = getenv('ENV') #TODO change before deploy 'debug'
 
     DB.init_app(app)
 
