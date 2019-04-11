@@ -4,7 +4,7 @@ Main Application and routing logic for TwitOff
 
 from os import getenv
 from dotenv import load_dotenv
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template
 from .models import DB, User
 from .predict import predict_user
 from .twitter import add_or_update_user, update_all_users
@@ -15,7 +15,6 @@ def create_app():
     '''
         Create and configure an instance of the Flask application.
     '''
-
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = getenv('DATABASE_URL')
     app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
@@ -30,7 +29,7 @@ def create_app():
 
     @app.route('/user', methods=['POST'])
     @app.route('/user/<name>', methods=['GET'])
-    def user(name=None, message = ''):
+    def user(name=None, message=''):
         name = name or request.values['user_name']
 
         try:
@@ -52,8 +51,8 @@ def create_app():
 
     @app.route('/update')
     def update():
-        users = update_all_users()
-        return render_template('index.html', title='Tweets Updated!', users=users)
+        update_all_users()
+        return render_template('index.html', title='Tweets Updated!', users=User.query.all())
 
     @app.route('/compare', methods=['POST'])
     def compare(message=''):
@@ -62,10 +61,13 @@ def create_app():
         if user1 == user2:
             message = 'Cannot compare a user to themselves!'
         else:
-            prediction = predict_user(user1, user2, request.values['tweet_text'])
-            message = '"{}" is more likely to be said by {} than {}'.format(
-                request.values['tweet_text'], user1 if prediction else user2,
-                user2 if prediction else user1)
+            tweet_text = request.values['tweet_text']
+            confidence = int(predict_user(user1, user2, tweet_text) * 100)
+            if confidence >= 50:
+                message = f'"{tweet_text}" is more likely to be said by {user1} than {user2}, with {confidence}% confidence'
+            else:
+                message = f'"{tweet_text}" is more likely to be said by {user2} than {user1}, with {100-confidence}% confidence'
         return render_template('prediction.html', title='Prediction', message=message)
+
 
     return app

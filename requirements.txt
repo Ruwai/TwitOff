@@ -1,0 +1,9 @@
+
+flask-sqlalchemy
+flask-migrate
+basilica
+tweepy
+scikit-learn
+gunicorn
+psycopg2
+python-dotenv
