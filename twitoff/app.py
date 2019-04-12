@@ -27,6 +27,17 @@ def create_app():
         users = User.query.all()
         return render_template('index.html', title='Home', users=users)
 
+    @app.route('/reset')
+    def reset():
+        DB.drop_all()
+        DB.create_all()
+        return render_template('index.html', title='DB Reset!')
+
+    @app.route('/update')
+    def update():
+        update_all_users()
+        return render_template('index.html', title='Tweets Updated!', users=User.query.all())
+
     @app.route('/user', methods=['POST'])
     @app.route('/user/<name>', methods=['GET'])
     def user(name=None, message=''):
@@ -42,17 +53,6 @@ def create_app():
             tweets = []
 
         return render_template('user.html', title=name, tweets=tweets, message=message)
-
-    @app.route('/reset')
-    def reset():
-        DB.drop_all()
-        DB.create_all()
-        return render_template('index.html', title='DB Reset!')
-
-    @app.route('/update')
-    def update():
-        update_all_users()
-        return render_template('index.html', title='Tweets Updated!', users=User.query.all())
 
     @app.route('/compare', methods=['POST'])
     def compare(message=''):
